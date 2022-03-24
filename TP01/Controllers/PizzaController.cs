@@ -29,12 +29,15 @@ namespace Pizzas.API.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(Pizza p)
+        public IActionResult Create(Pizza p) //no se por que pero se crean con un id raro..
         {
-            var afRows = DB.Create(p);
+            var created = DB.Create(p);
+            var afRows = created.Item1;
+            var idSql = created.Item2;
+
             if (afRows == 1)
             {
-                return Ok(p); // aca hay que hacer un 201 en realidad
+                return Created($"localhost:5000/api/Pizza/{idSql}", p); // en principio puse localhost. habria que hacer una variable general?
             }
             else
             {
@@ -49,8 +52,17 @@ namespace Pizzas.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteById(int id)
+        public IActionResult DeleteById(int id) 
         {
+            var afRows = DB.Delete(id);
+            if (afRows == 1)
+            {
+                return Ok($"Affected rows: {afRows}. Deleted pizza with ID {id}" ); // en principio puse localhost. habria que hacer una variable general?
+            }
+            else
+            {
+                return BadRequest(); // o errror
+            }
             return BadRequest();
         }
     }
