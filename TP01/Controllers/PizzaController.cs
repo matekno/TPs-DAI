@@ -10,27 +10,36 @@ using Pizzas.API.Utils;
 namespace Pizzas.API.Controllers
 {
     [ApiController]
-    [Route("[api]")]
+    [Route("api/[controller]")]
     public class PizzaController : ControllerBase
     {
         [HttpGet]
         public IActionResult GetAll()
         {
-            return BadRequest();
+            var pizzas = DB.GetAll();
+            return Ok(pizzas);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetByID(int id)
         {
-            DB.GetById(id); // no anda :C
-            return BadRequest();
+            var p = DB.GetById(id); // no anda :C
+            return Ok(p);
         }
 
         [HttpPost]
 
         public IActionResult Create(Pizza p)
         {
-            return BadRequest();
+            var afRows = DB.Create(p);
+            if (afRows == 1)
+            {
+                return Ok(p); // aca hay que hacer un 201 en realidad
+            }
+            else
+            {
+                return BadRequest(); // o errror
+            }
         }
 
         [HttpPut("{id}")]
@@ -44,15 +53,5 @@ namespace Pizzas.API.Controllers
         {
             return BadRequest();
         }
-
-
-
-
-
-
-
-
     }
-
-
 }
