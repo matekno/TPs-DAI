@@ -17,3 +17,12 @@ VALUES
 DELETE FROM [DAI-Pizzas].dbo.Pizzas
 WHERE Pizzas.Id=11
 GO
+
+/*Update*/
+UPDATE [DAI-Pizzas].dbo.Pizzas
+SET
+    Nombre = 'Pizza de Dulce de leche',
+    LibreGluten = 0,
+    Importe = 840,
+    Descripcion = 'La pizza más golosa del mercado'
+WHERE Id = 16

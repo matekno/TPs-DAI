@@ -17,7 +17,7 @@ namespace Pizzas.API.Utils
 			Pizza p = null;
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
 				string sql = "SELECT * FROM [DAI-Pizzas].[dbo].[Pizzas] WHERE [Pizzas].Id = @oId";
-				p = db.QueryFirstOrDefault < Pizza > (sql, new {
+				p = db.QueryFirstOrDefault <Pizza> (sql, new {
 					oId = id
 				});
 			}
@@ -29,7 +29,7 @@ namespace Pizzas.API.Utils
 			List < Pizza > pizzas = null;
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
 				string sql = "SELECT * FROM [DAI-Pizzas].dbo.Pizzas";
-				pizzas = db.Query < Pizza > (sql).ToList();
+				pizzas = db.Query <Pizza> (sql).ToList();
 			}
 
 			return pizzas;
@@ -38,6 +38,7 @@ namespace Pizzas.API.Utils
 		public static(int, int) Create(Pizza p) {
 			int affectedRows;
 			int id;
+			
 
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
 				string sql = "INSERT [DAI-Pizzas].dbo.[Pizzas]([Nombre], [LibreGluten], [Importe], [Descripcion]) VALUES( @oNombre, @oLibreGluten, @oImporte, @oDescripcion)";
@@ -49,7 +50,7 @@ namespace Pizzas.API.Utils
 				});
 
 				// no termino de entender si para un status code Created necesito mandar la forma de acceder. por las dudas lo hice asi jaja
-				id = db.QueryFirstOrDefault < int > ("SELECT TOP 1 * FROM [DAI-Pizzas].dbo.Pizzas ORDER BY ID DESC");
+				id = db.QueryFirstOrDefault <int> ("SELECT TOP 1 * FROM [DAI-Pizzas].dbo.Pizzas ORDER BY ID DESC");
 			}
 
 			return (affectedRows, id);
@@ -63,6 +64,23 @@ namespace Pizzas.API.Utils
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
 				string sql = "DELETE FROM [DAI-Pizzas].dbo.Pizzas WHERE Pizzas.Id=@oId";
 				affectedRows = db.Execute(sql, new {oId = id});
+			}
+			return affectedRows;
+		}
+
+		public static int Update(int id, Pizza p)
+		{
+			string sql = "UPDATE [DAI-Pizzas].dbo.Pizzas SET Nombre = @oNombre, LibreGluten = @oLibreGluten, Importe = @oImporte, Descripcion = @oDescripcion WHERE Id = @oId";
+			int affectedRows;
+			using (SqlConnection db = new SqlConnection(_connectionString))
+			{
+				affectedRows = db.Execute(sql, new {
+					oNombre = p.Nombre,
+					oLibreGluten = p.LibreGluten,
+					oImporte = p.Importe,
+					oDescripcion = p.Descripcion,
+					oId = id
+				});
 			}
 			return affectedRows;
 		}
