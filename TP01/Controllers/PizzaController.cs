@@ -37,7 +37,7 @@ namespace Pizzas.API.Controllers
 
             if (afRows == 1)
             {
-                return Created($"localhost:5000/api/Pizza/{idSql}", new {id = idSql, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion}); // en principio puse localhost. habria que hacer una variable general?
+                return CreatedAtAction(nameof(Create), new {id = idSql, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion}, p);
             }
             else
             {
