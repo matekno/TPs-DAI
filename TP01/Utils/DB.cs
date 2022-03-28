@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using Dapper;
 using Pizzas.API.Models;
@@ -11,76 +12,76 @@ namespace Pizzas.API.Utils
 	public class DB 
 	{
 		private static string
-		_connectionString = @"Server=DESKTOP-FQBUJMB\SQLEXPRESS;Database=DAI-Pizzas;User ID=Pizzas;Password=Pizzas;";
+		_connectionString = @"Server=A-BTA-07;Database=DAI-Pizzas;User ID=Pizzas;Password=Pizzas;";
 
 		public static Pizza GetById(int id) {
 			Pizza p = null;
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
-				string sql = "SELECT * FROM [DAI-Pizzas].[dbo].[Pizzas] WHERE [Pizzas].Id = @oId";
-				p = db.QueryFirstOrDefault <Pizza> (sql, new {
-					oId = id
-				});
+				string sql = "GetByID";
+				p = db.QueryFirstOrDefault <Pizza> (sql, new {Id = id}, commandType: CommandType.StoredProcedure);
 			}
-
 			return p;
 		}
 
 		public static IEnumerable < Pizza > GetAll() {
 			List < Pizza > pizzas = null;
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
-				string sql = "SELECT * FROM [DAI-Pizzas].dbo.Pizzas";
-				pizzas = db.Query <Pizza> (sql).ToList();
+				string sql = "GetAll";
+				pizzas = db.Query<Pizza>(sql, commandType: CommandType.StoredProcedure).ToList();
 			}
-
 			return pizzas;
 		}
 
+
+/// <summary>
+/// 	Permite Crear una pizza en base a un objeto pizza existente.
+/// </summary>
+/// <param name="p">Pizza</param>
+/// <returns></returns>
 		public static(int, int) Create(Pizza p) {
 			int affectedRows;
 			int id;
-			
 
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
-				string sql = "INSERT [DAI-Pizzas].dbo.[Pizzas]([Nombre], [LibreGluten], [Importe], [Descripcion]) VALUES( @oNombre, @oLibreGluten, @oImporte, @oDescripcion)";
+				string sql = "CreatePizza";
 				affectedRows = db.Execute(sql, new {
-					oNombre = p.Nombre,
-					oLibreGluten = p.LibreGluten,
-					oImporte = p.Importe,
-					oDescripcion = p.Descripcion
-				});
+					Nombre = p.Nombre,
+					LibreGluten = p.LibreGluten,
+					Importe = p.Importe,
+					Descripcion = p.Descripcion
+				}, commandType: CommandType.StoredProcedure);
 
 				// no termino de entender si para un status code Created necesito mandar la forma de acceder. por las dudas lo hice asi jaja
 				id = db.QueryFirstOrDefault <int> ("SELECT TOP 1 * FROM [DAI-Pizzas].dbo.Pizzas ORDER BY ID DESC");
 			}
-
 			return (affectedRows, id);
 		}
 
+
 		public static int Delete(int id) 
 		{
-			/**/
 			int affectedRows;
 
 			using(SqlConnection db = new SqlConnection(_connectionString)) {
-				string sql = "DELETE FROM [DAI-Pizzas].dbo.Pizzas WHERE Pizzas.Id=@oId";
-				affectedRows = db.Execute(sql, new {oId = id});
+				string sql = "DeletePizza";
+				affectedRows = db.Execute(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
 			}
 			return affectedRows;
 		}
 
 		public static int Update(int id, Pizza p)
 		{
-			string sql = "UPDATE [DAI-Pizzas].dbo.Pizzas SET Nombre = @oNombre, LibreGluten = @oLibreGluten, Importe = @oImporte, Descripcion = @oDescripcion WHERE Id = @oId";
+			string sql = "UpdatePizza";
 			int affectedRows;
 			using (SqlConnection db = new SqlConnection(_connectionString))
 			{
 				affectedRows = db.Execute(sql, new {
-					oNombre = p.Nombre,
-					oLibreGluten = p.LibreGluten,
-					oImporte = p.Importe,
-					oDescripcion = p.Descripcion,
-					oId = id
-				});
+					Nombre = p.Nombre,
+					LibreGluten = p.LibreGluten,
+					Importe = p.Importe,
+					Descripcion = p.Descripcion,
+					Id = id
+				}, commandType: CommandType.StoredProcedure);
 			}
 			return affectedRows;
 		}
