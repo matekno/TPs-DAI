@@ -26,3 +26,7 @@ SET
     Importe = 840,
     Descripcion = 'La pizza más golosa del mercado'
 WHERE Id = 16
+
+
+/*GetUsuario*/
+SELECT * FROM [DAI-Pizzas].dbo.Usuarios WHERE Usuarios.UserName = 'CatAlt'
