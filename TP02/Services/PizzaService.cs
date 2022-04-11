@@ -36,28 +36,23 @@ namespace Pizzas.API.Services
             return pizzas;
         }
 
-        public static (int, int) Create(Pizza p)
+        public static int Create(Pizza p)
         {
-            int affectedRows;
             int id;
 
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "CreatePizza";
-                affectedRows = db.Execute(sql, new
+                id = db.QuerySingle<int>(sql, new
                 {
                     Nombre = p.Nombre,
                     LibreGluten = p.LibreGluten,
                     Importe = p.Importe,
                     Descripcion = p.Descripcion
                 }, commandType: CommandType.StoredProcedure);
-
-                // no termino de entender si para un status code Created necesito mandar la forma de acceder. por las dudas lo hice asi jaja
-                id = db.QuerySingle<int>("SELECT CAST(SCOPE_IDENTITY() AS INT)");
             }
-
-
-            return (affectedRows, id);
+            p.Id = id;
+            return id;
         }
 
         public static int Delete(int id)

@@ -47,12 +47,10 @@ namespace Pizzas.API.Controllers
             var isValid = UserService.IsValidToken(token);
             if (isValid == true)
             {
-                var created = PizzaService.Create(p);
-                var afRows = created.Item1;
-                var idSql = created.Item2;
-                if (afRows == 1)
+                var idP = PizzaService.Create(p);
+                if (idP is int)
                 {
-                    return CreatedAtAction(nameof(Create), new {id = idSql, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion}, p);
+                    return CreatedAtAction(nameof(Create), new { id = idP, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion }, p);
                 }
                 else
                 {

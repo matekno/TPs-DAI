@@ -14,10 +14,10 @@ namespace Pizzas.API.Controllers
     [Route("api/[controller]")]
     public class UsuariosController : ControllerBase
     {
-        [HttpPost("{userName}, {pwd}")]
-        public IActionResult Login(string userName, string pwd)
+        [HttpPost]
+        public IActionResult Login(Login u)
         {
-            var user = UserService.Login(userName, pwd);
+            var user = UserService.Login(u.UserName, u.Password);
             if (user is Usuario)
             {
                 return Ok(user);

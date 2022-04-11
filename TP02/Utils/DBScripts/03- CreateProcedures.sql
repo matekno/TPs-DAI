@@ -16,6 +16,7 @@ AS
         ([Nombre], [LibreGluten], [Importe], [Descripcion])
     VALUES
         (@nombre, @libreGluten, @importe, @descripcion)
+	SELECT CAST(SCOPE_IDENTITY() as int);
 GO;
 
 CREATE PROCEDURE DeletePizza @id INT
