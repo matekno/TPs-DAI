@@ -11,15 +11,33 @@ using Pizzas.API.Utils;
 
 namespace Pizzas.API.Services
 {
-    public class UserService
+    public static class UserService
     {
+        public static bool IsValidToken(string token)
+        {
+            bool isValid = false;
+            var user = GetUsuarioByToken(token);
+            if (user is not null)
+            {
+                int comparison = DateTime.Compare(DateTime.Now, user.TokenExpirationDate);
+                if (comparison < 0)
+                {
+                    // la hora actual es mayor a la hora de expiracion
+                    isValid = true;
+                }
+            }
+
+
+            return isValid;
+        }
+
         public static Usuario Login(string userName, string pwd)
         {
             var user = GetUsuario(userName, pwd);
-            if (user is Usuario)// si el usuario existe
+            if (user is Usuario) // si el usuario existe
             {
                 var token = RefreshToken(user.Id);
-                if (token != null) 
+                if (token != null)
                 {
                     user = GetUsuario(userName, pwd); // volvemos a pedir el usuario, refrescando token
                     return user;
@@ -36,14 +54,16 @@ namespace Pizzas.API.Services
             }
         }
 
-        public static Usuario GetUsuario(string userName, string pwd)
+        private static Usuario GetUsuario(string userName, string pwd)
         {
             var user = new Usuario();
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "SELECT * FROM [DAI-Pizzas].dbo.Usuarios WHERE Usuarios.UserName = @oUserName AND Usuarios.Password = @oPwd";
-                user = db.QueryFirstOrDefault<Usuario>(sql, new { oUserName = userName, oPwd = pwd });
+                user = db.QueryFirstOrDefault<Usuario>(sql, new {oUserName = userName, oPwd = pwd});
             }
+
+
             if (user is Usuario)
             {
                 return user;
@@ -54,18 +74,19 @@ namespace Pizzas.API.Services
             }
         }
 
-        public static Usuario GetUsuarioByToken(string token)
+        private static Usuario GetUsuarioByToken(string token)
         {
             var user = new Usuario();
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "SELECT * FROM [DAI-Pizzas].dbo.Usuarios WHERE Usuarios.Token = @oToken";
-                user = db.QueryFirstOrDefault<Usuario>(sql, new { oToken = token });
+                user = db.QueryFirstOrDefault<Usuario>(sql, new {oToken = token});
+                //TODO Estaria bueno poner aca y alla un try catch para que no devuelva 500.
             }
             return user;
         }
 
-        public static string RefreshToken(int id)
+        private static string RefreshToken(int id)
         {
             string token = Guid.NewGuid().ToString();
             int affectedRows;
@@ -73,8 +94,10 @@ namespace Pizzas.API.Services
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "UPDATE [DAI-Pizzas].dbo.Usuarios SET Token = @oToken, TokenExpirationDate = DateAdd(MINUTE, 15, GetDate()) WHERE Usuarios.Id = @oId";
-                affectedRows = db.Execute(sql, new { oToken = token, oId = id });
+                affectedRows = db.Execute(sql, new {oToken = token, oId = id});
             }
+
+
             if (affectedRows == 1)
             {
                 return token;
@@ -85,6 +108,4 @@ namespace Pizzas.API.Services
             }
         }
     }
-
-
 }

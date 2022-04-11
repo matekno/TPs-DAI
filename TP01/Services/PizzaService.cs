@@ -10,7 +10,7 @@ using Pizzas.API.Utils;
 
 namespace Pizzas.API.Services
 {
-    public class PizzaService
+    public static class PizzaService
     {
         public static Pizza GetById(int id)
         {
@@ -18,7 +18,7 @@ namespace Pizzas.API.Services
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "GetByID";
-                p = db.QueryFirstOrDefault<Pizza>(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                p = db.QueryFirstOrDefault<Pizza>(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
             }
             return p;
         }
@@ -31,6 +31,8 @@ namespace Pizzas.API.Services
                 string sql = "GetAll";
                 pizzas = db.Query<Pizza>(sql, commandType: CommandType.StoredProcedure).ToList();
             }
+
+
             return pizzas;
         }
 
@@ -53,9 +55,11 @@ namespace Pizzas.API.Services
                 // no termino de entender si para un status code Created necesito mandar la forma de acceder. por las dudas lo hice asi jaja
                 id = db.QuerySingle<int>("SELECT CAST(SCOPE_IDENTITY() AS INT)");
             }
+
+
             return (affectedRows, id);
         }
-        
+
         public static int Delete(int id)
         {
             int affectedRows;
@@ -63,8 +67,10 @@ namespace Pizzas.API.Services
             using (SqlConnection db = DB.GetConnection())
             {
                 string sql = "DeletePizza";
-                affectedRows = db.Execute(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                affectedRows = db.Execute(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
             }
+
+
             return affectedRows;
         }
 
@@ -83,6 +89,9 @@ namespace Pizzas.API.Services
                     Id = id
                 }, commandType: CommandType.StoredProcedure);
             }
+
+
             return affectedRows;
         }
     }
+}

@@ -41,3 +41,10 @@ SET
     Token = '0f8fad5b-d9cb-469f-a165-70867728950e', /*aca se puede usar NEWID()*/
     TokenExpirationDate = DateAdd(MINUTE, 15, GetDate())
 WHERE Usuarios.UserName = 'JoaAbr'
+
+/*IsValidToken*/
+SELECT
+    Token,
+    TokenExpirationDate
+FROM [DAI-Pizzas].[dbo].[Usuarios]
+WHERE TOKEN = @token
