@@ -21,16 +21,15 @@ namespace Pizzas.API.Helpers
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    throw;
-                    // throw new ("El path es readonly, esta oculto o el usuario no tiene acceso.";
+                    Console.WriteLine(ex.Message);
                 }
                 catch (ArgumentException ex)
                 {
-                    throw;
+                    Console.WriteLine(ex.Message);
                 }
-                catch (DirectoryNotFoundException)
+                catch (DirectoryNotFoundException ex)
                 {
-                    throw;
+                    Console.WriteLine(ex.Message);
                 }
             }
             // si el archivo ya existe, escribe el valor de data ahi.
@@ -47,10 +46,9 @@ namespace Pizzas.API.Helpers
                             hasWritten = true;
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        throw;
-
+                        Console.WriteLine(ex.Message);
                     }
                 }
             }

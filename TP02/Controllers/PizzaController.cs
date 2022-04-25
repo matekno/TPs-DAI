@@ -1,6 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Pizzas.API.Models;
 using Pizzas.API.Services;
+using Pizzas.API.Utils;
 
 namespace Pizzas.API.Controllers
 {
@@ -13,10 +15,20 @@ namespace Pizzas.API.Controllers
         {
             string token = Request.Headers["token"];
             var isValid = UserService.IsValidToken(token);
+
             if (isValid == true)
             {
-                var pizzas = PizzaService.GetAll();
-                return Ok(pizzas);
+                try
+                {
+                    var pizzas = PizzaService.GetAll();
+                    return Ok(pizzas);
+                }
+                catch (Exception ex)
+                {
+                    string s = CustomLog.GetLogError(ex);
+                    CustomLog.WriteLogByAppSetting(s);
+                    return Problem(s);
+                }
             }
             else
             {
