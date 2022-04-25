@@ -19,6 +19,7 @@ namespace Pizzas.API.Utils
         {
             string a = Environment.NewLine;
             a += "-----------------------------------------------------------";
+            a += Environment.NewLine;
             return a;
         }
         public static string GetLogError()

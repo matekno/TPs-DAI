@@ -17,15 +17,30 @@ namespace Pizzas.API.Controllers
         [HttpPost]
         public IActionResult Login(Login u)
         {
-            var user = UserService.Login(u.UserName, u.Password);
-            if (user is Usuario)
+            IActionResult toReturn = null;
+            Usuario user = null;
+            try
             {
-                return Ok(user);
+                user = UserService.Login(u.UserName, u.Password);
             }
-            else
+            catch (Exception ex)
             {
-                return Unauthorized(user);
+                string s = CustomLog.GetLogError(ex);
+                CustomLog.WriteLogByAppSetting(s);
             }
+            finally
+            {
+                if (user is Usuario)
+                {
+                    toReturn = Ok(user);
+                }
+                else
+                {
+                    toReturn = Unauthorized(user);
+                }
+            }
+            return toReturn;
+
         }
 
 

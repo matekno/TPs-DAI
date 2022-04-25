@@ -10,14 +10,15 @@ namespace Pizzas.API.Helpers
             string fullPath = Path.Combine(path, fileName);
             bool hasWritten = false;
 
-            FileStream logFile = null;
-
             // si el archivo no existe, lo crea.
             if (!File.Exists(fullPath))
             {
                 try
                 {
-                    logFile = File.Create(fullPath);
+                    using (StreamWriter sw = File.AppendText(fullPath))
+                    {
+                        sw.Write(data);
+                    }
                 }
                 catch (UnauthorizedAccessException ex)
                 {
@@ -35,21 +36,19 @@ namespace Pizzas.API.Helpers
             // si el archivo ya existe, escribe el valor de data ahi.
             else
             {
-                if (logFile is FileStream) // si el archivo fue creado correctamente aprox
+
+                try
                 {
-                    try
+                    using (StreamWriter sw = File.AppendText(fullPath))
                     {
-                        using (var logWriter = new StreamWriter(logFile))
-                        {
-                            logWriter.Write(data);
-                            logWriter.Dispose();
-                            hasWritten = true;
-                        }
+                        sw.Write(data);
+                        hasWritten = true;
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    hasWritten = false;
+                    Console.WriteLine(ex.Message);
                 }
             }
             return hasWritten;

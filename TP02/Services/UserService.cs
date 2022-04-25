@@ -16,14 +16,26 @@ namespace Pizzas.API.Services
         public static bool IsValidToken(string token)
         {
             bool isValid = false;
-            var user = GetUsuarioByToken(token);
-            if (user is not null)
+            Usuario user = null;
+            try
             {
-                int comparison = DateTime.Compare(DateTime.Now, user.TokenExpirationDate);
-                if (comparison < 0)
+                user = GetUsuarioByToken(token);
+            }
+            catch (System.Exception ex)
+            {
+                string s = CustomLog.GetLogError(ex);
+                CustomLog.WriteLogByAppSetting(s);
+            }
+            finally
+            {
+                if (user is not null)
                 {
-                    // la hora actual es mayor a la hora de expiracion
-                    isValid = true;
+                    int comparison = DateTime.Compare(DateTime.Now, user.TokenExpirationDate);
+                    if (comparison < 0)
+                    {
+                        // la hora actual es mayor a la hora de expiracion
+                        isValid = true;
+                    }
                 }
             }
             return isValid;
@@ -55,21 +67,27 @@ namespace Pizzas.API.Services
         private static Usuario GetUsuario(string userName, string pwd)
         {
             var user = new Usuario();
-            using (SqlConnection db = DB.GetConnection())
+            try
             {
-                string sql = "SELECT * FROM [DAI-Pizzas].dbo.Usuarios WHERE Usuarios.UserName = @oUserName AND Usuarios.Password = @oPwd";
-                user = db.QueryFirstOrDefault<Usuario>(sql, new { oUserName = userName, oPwd = pwd });
+                using (SqlConnection db = DB.GetConnection())
+                {
+                    string sql = "SELECT * FROM [DAI-Pizzas].dbo.Usuarios WHERE Usuarios.UserName = @oUserName AND Usuarios.Password = @oPwd";
+                    user = db.QueryFirstOrDefault<Usuario>(sql, new { oUserName = userName, oPwd = pwd });
+                }
+                if (user is Usuario)
+                {
+                    return user;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
 
-
-            if (user is Usuario)
-            {
-                return user;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         private static Usuario GetUsuarioByToken(string token)

@@ -15,10 +15,18 @@ namespace Pizzas.API.Services
         public static Pizza GetById(int id)
         {
             Pizza p = null;
-            using (SqlConnection db = DB.GetConnection())
+
+            try
             {
-                string sql = "GetByID";
-                p = db.QueryFirstOrDefault<Pizza>(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
+                using (SqlConnection db = DB.GetConnection())
+                {
+                    string sql = "GetByID";
+                    p = db.QueryFirstOrDefault<Pizza>(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
             return p;
         }
@@ -26,67 +34,86 @@ namespace Pizzas.API.Services
         public static IEnumerable<Pizza> GetAll()
         {
             List<Pizza> pizzas = null;
-            using (SqlConnection db = DB.GetConnection())
+            try
             {
-                string sql = "GetAll";
-                pizzas = db.Query<Pizza>(sql, commandType: CommandType.StoredProcedure).ToList();
+                using (SqlConnection db = DB.GetConnection())
+                {
+                    string sql = "GetAll";
+                    pizzas = db.Query<Pizza>(sql, commandType: CommandType.StoredProcedure).ToList();
+                }
             }
-
-
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
             return pizzas;
         }
 
         public static int Create(Pizza p)
         {
-            int id;
-
-            using (SqlConnection db = DB.GetConnection())
+            int id = -1;
+            try
             {
-                string sql = "CreatePizza";
-                id = db.QuerySingle<int>(sql, new
+                using (SqlConnection db = DB.GetConnection())
                 {
-                    Nombre = p.Nombre,
-                    LibreGluten = p.LibreGluten,
-                    Importe = p.Importe,
-                    Descripcion = p.Descripcion
-                }, commandType: CommandType.StoredProcedure);
+                    string sql = "CreatePizza";
+                    id = db.QuerySingle<int>(sql, new
+                    {
+                        Nombre = p.Nombre,
+                        LibreGluten = p.LibreGluten,
+                        Importe = p.Importe,
+                        Descripcion = p.Descripcion
+                    }, commandType: CommandType.StoredProcedure);
+                }
+                p.Id = id;
             }
-            p.Id = id;
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
             return id;
         }
 
-        public static int Delete(int id)
+        public static void Delete(int id)
         {
             int affectedRows;
-
-            using (SqlConnection db = DB.GetConnection())
+            try
             {
-                string sql = "DeletePizza";
-                affectedRows = db.Execute(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
+                using (SqlConnection db = DB.GetConnection())
+                {
+                    string sql = "DeletePizza";
+                    affectedRows = db.Execute(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                }
             }
-
-
-            return affectedRows;
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public static int Update(int id, Pizza p)
+        public static void Update(int id, Pizza p)
         {
             string sql = "UpdatePizza";
             int affectedRows;
-            using (SqlConnection db = DB.GetConnection())
+
+            try
             {
-                affectedRows = db.Execute(sql, new
+                using (SqlConnection db = DB.GetConnection())
                 {
-                    Nombre = p.Nombre,
-                    LibreGluten = p.LibreGluten,
-                    Importe = p.Importe,
-                    Descripcion = p.Descripcion,
-                    Id = id
-                }, commandType: CommandType.StoredProcedure);
+                    affectedRows = db.Execute(sql, new
+                    {
+                        Nombre = p.Nombre,
+                        LibreGluten = p.LibreGluten,
+                        Importe = p.Importe,
+                        Descripcion = p.Descripcion,
+                        Id = id
+                    }, commandType: CommandType.StoredProcedure);
+                }
             }
-
-
-            return affectedRows;
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

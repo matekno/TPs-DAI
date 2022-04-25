@@ -12,7 +12,7 @@ namespace Pizzas.API.Utils
     public class DB
     {
         private static string
-        _connectionString = @"Server=A-BTA-04;Database=DAI-Pizzas;User ID=Pizzas;Password=Pizzas;"; // hacerlo readonly"?
+        _connectionString = @"Server=A-BTA-06;Database=DAI-Pizzas;User ID=Pizzas;Password=Pizzas;"; // hacerlo readonly"?
 
         public static SqlConnection GetConnection()
         {
