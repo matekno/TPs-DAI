@@ -69,7 +69,9 @@ namespace Pizzas.API.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex, $"Error con la pizza ID: {id}");
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
             return id;
         }
