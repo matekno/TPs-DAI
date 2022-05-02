@@ -1,8 +1,6 @@
-using System;
 using Microsoft.AspNetCore.Mvc;
 using Pizzas.API.Models;
 using Pizzas.API.Services;
-using Pizzas.API.Utils;
 
 namespace Pizzas.API.Controllers
 {
@@ -15,25 +13,14 @@ namespace Pizzas.API.Controllers
         {
             string token = Request.Headers["token"];
             var isValid = UserService.IsValidToken(token);
-
             if (isValid == true)
             {
-                try
-                {
-                    var pizzas = PizzaService.GetAll();
-                    return Ok(pizzas);
-                }
-                catch (Exception ex)
-                {
-                    string s = CustomLog.GetLogError(ex);
-                    return Problem(s);
-                }
+                var pizzas = PizzaService.GetAll();
+                return Ok(pizzas);
             }
             else
             {
-                string s = CustomLog.GetLogError($"Token no valido: \n", token);
-                CustomLog.WriteLogByAppSetting(s);
-                return Unauthorized(s);
+                return Unauthorized(token);
             }
         }
 
@@ -44,70 +31,44 @@ namespace Pizzas.API.Controllers
             var isValid = UserService.IsValidToken(token);
             if (isValid == true)
             {
-                try
-                {
-                    var p = PizzaService.GetById(id);
-                    return Ok(p);
-                }
-                catch (Exception ex)
-                {
-                    string s = CustomLog.GetLogError(ex, $"Error con la pizza ID: {id}");
-                    return Problem(s);
-                }
+                var p = PizzaService.GetById(id);
+                return Ok(p);
             }
             else
             {
-                string s = CustomLog.GetLogError($"Token no valido: \n", token);
-                CustomLog.WriteLogByAppSetting(s);
-                return Unauthorized(s);
+                return Unauthorized(token);
             }
         }
 
-
         [HttpPost]
-        public IActionResult Create(Pizza p)
+        public IActionResult Create(Pizza p) // TODO No esta testeado este metodo
         {
             string token = Request.Headers["token"];
             var isValid = UserService.IsValidToken(token);
-
-            if (p is not Pizza)
+            if (isValid == true)
             {
-                // si le faltan arrgumentos seria
-                string s = CustomLog.GetLogError($"Faltan argumentos: \n", p);
-                CustomLog.WriteLogByAppSetting(s);
-                return BadRequest(p);
-
-            }
-            else
-            {
-                if (isValid == true)
+                var idP = PizzaService.Create(p);
+                if (idP is int)
                 {
-                    try
-                    {
-                        var idP = PizzaService.Create(p);
-                        return CreatedAtAction(nameof(Create), new {id = idP, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion}, p);
-                    }
-                    catch (Exception ex)
-                    {
-                        string s = CustomLog.GetLogError(ex, p);
-                        return Problem(s);
-                    }
+                    return CreatedAtAction(nameof(Create), new { id = idP, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion }, p);
                 }
                 else
                 {
-                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
-                    CustomLog.WriteLogByAppSetting(s);
-                    return Unauthorized(s);
+                    return BadRequest(); // o errror
                 }
+            }
+            else
+            {
+                return Unauthorized();
             }
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult UpdateById(int id, Pizza p)
+        public IActionResult UpdateById(int id, Pizza p) // TODO No esta testeado este metodo
         {
             if (id != p.Id)
             {
-                return BadRequest(CustomLog.GetLogError($"El ID del body ({p.Id}) es distinto al del request ({id})..", p));
+                return BadRequest($"El ID del body ({p.Id}) es distinto al del request ({id})..");
             }
             else
             {
@@ -115,22 +76,19 @@ namespace Pizzas.API.Controllers
                 var isValid = UserService.IsValidToken(token);
                 if (isValid == true)
                 {
-                    try
+                    var affRows = PizzaService.Update(id, p);
+                    if (affRows == 1)
                     {
-                        PizzaService.Update(id, p);
                         return Ok(p);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        string s = CustomLog.GetLogError(ex, p);
-                        return Problem(s);
+                        return NotFound($"No se encontro la pizza con el ID {id}");
                     }
                 }
                 else
                 {
-                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
-                    CustomLog.WriteLogByAppSetting(s);
-                    return Unauthorized(s);
+                    return Unauthorized(token);
                 }
             }
         }
@@ -140,9 +98,7 @@ namespace Pizzas.API.Controllers
         {
             if (id <= 0)
             {
-                string s = CustomLog.GetLogError($"ID ({id}) es menor o igual a 0..");
-                CustomLog.WriteLogByAppSetting(s);
-                return BadRequest(s);
+                return BadRequest("ID es menor o igual a 0..");
             }
             else
             {
@@ -150,22 +106,21 @@ namespace Pizzas.API.Controllers
                 var isValid = UserService.IsValidToken(token);
                 if (isValid == true)
                 {
-                    try
+                    var afRows = PizzaService.Delete(id);
+                    if (afRows == 0)
                     {
-                        PizzaService.Delete(id);
-                    }
-                    catch (Exception ex)
-                    {
-                        return Problem(CustomLog.GetLogError(ex.Message));
-                    }
-                    return Ok($"Deleted pizza with ID {id}");
+                        return NotFound("El ID no corresponde a ninguna pizza..");
 
+                    }
+                    else
+                    {
+                        return Ok($"Affected rows: {afRows}. Deleted pizza with ID {id}"); // en principio puse localhost. habria que hacer una variable general?
+
+                    }
                 }
                 else
                 {
-                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
-                    CustomLog.WriteLogByAppSetting(s);
-                    return Unauthorized(s);
+                    return Unauthorized(token);
                 }
             }
         }
