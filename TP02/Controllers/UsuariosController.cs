@@ -25,8 +25,7 @@ namespace Pizzas.API.Controllers
             }
             catch (Exception ex)
             {
-                string s = CustomLog.GetLogError(ex);
-                CustomLog.WriteLogByAppSetting(s);
+                toReturn = Problem(CustomLog.GetLogError(ex));
             }
             finally
             {
@@ -42,7 +41,5 @@ namespace Pizzas.API.Controllers
             return toReturn;
 
         }
-
-
     }
 }

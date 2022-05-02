@@ -26,13 +26,14 @@ namespace Pizzas.API.Controllers
                 catch (Exception ex)
                 {
                     string s = CustomLog.GetLogError(ex);
-                    CustomLog.WriteLogByAppSetting(s);
                     return Problem(s);
                 }
             }
             else
             {
-                return Unauthorized(token);
+                string s = CustomLog.GetLogError($"Token no valido: \n", token);
+                CustomLog.WriteLogByAppSetting(s);
+                return Unauthorized(s);
             }
         }
 
@@ -51,19 +52,20 @@ namespace Pizzas.API.Controllers
                 catch (Exception ex)
                 {
                     string s = CustomLog.GetLogError(ex, $"Error con la pizza ID: {id}");
-                    CustomLog.WriteLogByAppSetting(s);
                     return Problem(s);
                 }
             }
             else
             {
-                return Unauthorized(token);
+                string s = CustomLog.GetLogError($"Token no valido: \n", token);
+                CustomLog.WriteLogByAppSetting(s);
+                return Unauthorized(s);
             }
         }
 
 
         [HttpPost]
-        public IActionResult Create(Pizza p) // TODO No esta testeado este metodo
+        public IActionResult Create(Pizza p)
         {
             string token = Request.Headers["token"];
             var isValid = UserService.IsValidToken(token);
@@ -71,7 +73,10 @@ namespace Pizzas.API.Controllers
             if (p is not Pizza)
             {
                 // si le faltan arrgumentos seria
+                string s = CustomLog.GetLogError($"Faltan argumentos: \n", p);
+                CustomLog.WriteLogByAppSetting(s);
                 return BadRequest(p);
+
             }
             else
             {
@@ -80,23 +85,21 @@ namespace Pizzas.API.Controllers
                     try
                     {
                         var idP = PizzaService.Create(p);
-                        return CreatedAtAction(nameof(Create), new { id = idP, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion }, p);
+                        return CreatedAtAction(nameof(Create), new {id = idP, nombre = p.Nombre, libreGluten = p.LibreGluten, importe = p.Importe, descripcion = p.Descripcion}, p);
                     }
                     catch (Exception ex)
                     {
                         string s = CustomLog.GetLogError(ex, p);
-                        CustomLog.WriteLogByAppSetting(s);
                         return Problem(s);
-
                     }
                 }
                 else
                 {
-                    return Unauthorized();
+                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
+                    CustomLog.WriteLogByAppSetting(s);
+                    return Unauthorized(s);
                 }
             }
-
-
         }
 
         [HttpPut("{id:int}")]
@@ -104,8 +107,7 @@ namespace Pizzas.API.Controllers
         {
             if (id != p.Id)
             {
-                string s = CustomLog.GetLogError($"El ID del body ({p.Id}) es distinto al del request ({id})..");
-                return BadRequest(s);
+                return BadRequest(CustomLog.GetLogError($"El ID del body ({p.Id}) es distinto al del request ({id})..", p));
             }
             else
             {
@@ -121,13 +123,14 @@ namespace Pizzas.API.Controllers
                     catch (Exception ex)
                     {
                         string s = CustomLog.GetLogError(ex, p);
-                        CustomLog.WriteLogByAppSetting(s);
                         return Problem(s);
                     }
                 }
                 else
                 {
-                    return Unauthorized(token);
+                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
+                    CustomLog.WriteLogByAppSetting(s);
+                    return Unauthorized(s);
                 }
             }
         }
@@ -137,7 +140,9 @@ namespace Pizzas.API.Controllers
         {
             if (id <= 0)
             {
-                return BadRequest("ID es menor o igual a 0..");
+                string s = CustomLog.GetLogError($"ID ({id}) es menor o igual a 0..");
+                CustomLog.WriteLogByAppSetting(s);
+                return BadRequest(s);
             }
             else
             {
@@ -148,18 +153,19 @@ namespace Pizzas.API.Controllers
                     try
                     {
                         PizzaService.Delete(id);
-                        return Ok($"Deleted pizza with ID {id}");
                     }
                     catch (Exception ex)
                     {
-                        string s = CustomLog.GetLogError(ex, $"Se recibio la pizza con ID {id}");
-                        CustomLog.WriteLogByAppSetting(s);
-                        return Problem(s);
+                        return Problem(CustomLog.GetLogError(ex.Message));
                     }
+                    return Ok($"Deleted pizza with ID {id}");
+
                 }
                 else
                 {
-                    return Unauthorized(token);
+                    string s = CustomLog.GetLogError($"Token no valido: \n", token);
+                    CustomLog.WriteLogByAppSetting(s);
+                    return Unauthorized(s);
                 }
             }
         }

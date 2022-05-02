@@ -85,7 +85,9 @@ namespace Pizzas.API.Services
             }
             catch (System.Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex, user);
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
 
         }

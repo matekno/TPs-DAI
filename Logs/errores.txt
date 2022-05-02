@@ -1,0 +1,33 @@
+
+HORA:01/05/2022 10:29:52 p. m.
+----------
+ERROR: Sequence contains no elements
+-----
+DATOS: "Error con la pizza ID: -1"
+----------
+HORA:01/05/2022 10:31:53 p. m.
+----------
+ERROR: Sequence contains no elements
+-----
+DATOS: "Error con la pizza ID: -1"
+----------
+HORA:01/05/2022 10:34:18 p. m.
+-----
+ERROR: Token no valido: 
+
+----------
+DATOS: d6716fe7-c8bb-49bb-a024-
+----------
+HORA:01/05/2022 10:35:17 p. m.
+-----
+ERROR: Token no valido: 
+
+----------
+DATOS: d6716fe7-c8bb-49bb-a024-
+----------
+HORA:01/05/2022 10:45:21 p. m.
+----------
+ERROR: No se pudo borrar la pizza con ID 1888
+-----
+DATOS: "No se pudo borrar la pizza con ID 1888"
+----------

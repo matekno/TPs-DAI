@@ -22,25 +22,25 @@ namespace Pizzas.API.Utils
             a += Environment.NewLine;
             return a;
         }
-        public static string GetLogError()
+        public static string GetLogError(int len=10)
         {
             DateTime dateTime = DateTime.Now;
-            string s = $"HORA:{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt")}";
-            s += AddNewLineToLog(10);
+            string s = $"HORA:{DateTime.Now:dd/MM/yyyy hh:mm:ss tt}";
+            s += AddNewLineToLog(len);
             return s;
         }
 
-        public static string GetLogError(Exception ex)
+        public static string GetLogError(Exception ex, int len=10)
         {
             string s = GetLogError();
             s += $"ERROR: {ex.Message}";
-            s += AddNewLineToLog(10);
+            s += AddNewLineToLog(len);
             return s;
         }
 
-        public static string GetLogError(string errorData)
+        public static string GetLogError(string errorData, int len=10)
         {
-            string s = GetLogError();
+            string s = GetLogError(5);
             s += $"ERROR: {errorData}";
             s += AddNewLineToLog(10);
             return s;
@@ -48,7 +48,7 @@ namespace Pizzas.API.Utils
         public static string GetLogError(Exception ex, object datos)
         {
             string o = JsonSerializer.Serialize(datos);
-            string s = GetLogError(ex);
+            string s = GetLogError(ex, 5);
             s += $"DATOS: {o}";
             s += AddNewLineToLog(10);
             return s;
@@ -56,7 +56,7 @@ namespace Pizzas.API.Utils
 
         public static string GetLogError(string errorData, object datos)
         {
-            string s = GetLogError(errorData);
+            string s = GetLogError(errorData, 5);
             s += $"DATOS: {datos}";
             s += AddNewLineToLog(10);
             return s;

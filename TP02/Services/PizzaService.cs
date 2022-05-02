@@ -21,13 +21,17 @@ namespace Pizzas.API.Services
                 using (SqlConnection db = DB.GetConnection())
                 {
                     string sql = "GetByID";
-                    p = db.QueryFirstOrDefault<Pizza>(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                    p = db.QueryFirstOrDefault<Pizza>(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
                 }
             }
             catch (System.Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex.Message);
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
+
+
             return p;
         }
 
@@ -42,12 +46,17 @@ namespace Pizzas.API.Services
                     pizzas = db.Query<Pizza>(sql, commandType: CommandType.StoredProcedure).ToList();
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex.Message);
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
+
+
             return pizzas;
         }
+
 
         public static int Create(Pizza p)
         {
@@ -65,6 +74,8 @@ namespace Pizzas.API.Services
                         Descripcion = p.Descripcion
                     }, commandType: CommandType.StoredProcedure);
                 }
+
+
                 p.Id = id;
             }
             catch (Exception ex)
@@ -73,6 +84,8 @@ namespace Pizzas.API.Services
                 CustomLog.WriteLogByAppSetting(s);
                 throw;
             }
+
+
             return id;
         }
 
@@ -84,12 +97,20 @@ namespace Pizzas.API.Services
                 using (SqlConnection db = DB.GetConnection())
                 {
                     string sql = "DeletePizza";
-                    affectedRows = db.Execute(sql, new { Id = id }, commandType: CommandType.StoredProcedure);
+                    affectedRows = db.Execute(sql, new {Id = id}, commandType: CommandType.StoredProcedure);
                 }
+                
+                if (affectedRows == 0)
+                {
+                    throw new Exception($"No se pudo borrar la pizza con ID {id}");
+                }
+
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex, $"No se pudo borrar la pizza con ID {id}");
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
         }
 
@@ -112,9 +133,11 @@ namespace Pizzas.API.Services
                     }, commandType: CommandType.StoredProcedure);
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                string s = CustomLog.GetLogError(ex, $"No se pudo actualizar la pizza con ID {id}");
+                CustomLog.WriteLogByAppSetting(s);
+                throw;
             }
         }
     }
